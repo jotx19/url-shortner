@@ -10,26 +10,31 @@ import (
 type URL struct {
 	ID           string    `json:"id"`
 	OriginalURL  string    `json:"original_url"`
-	ShortenedURL string    `json:"shortened_url"`
-	CreatedAt    time.Time `json:"created_at"`
+	ShortURL     string    `json:"short_url"`
+	CreationDate time.Time `json:"creation_date"`
 }
-
 var urlDB = make(map[string]URL)
 
 func generateShortURL(OriginalURL string) string {
 	hasher := md5.New()
 	hasher.Write([]byte(OriginalURL))
-	fmt.Println("Hashing URL:", hasher)
+	fmt.Println("hasher: ", hasher)
 	data := hasher.Sum(nil)
-	fmt.Println("Hashed data:", data)
+	fmt.Println("hasher data: ", data)
 	hash := hex.EncodeToString(data)
-	fmt.Println("Hex encoded hash:", hash)
-	fmt.Println("Fianl String:", hash[0:8])
-	return hash[0:8]
+	fmt.Println("EncodeToString: ", hash)
+	fmt.Println("final string: ", hash[:8])
+	return hash[:8]
 }
 
-func main() {
-	fmt.Println("Hello, World!")
-	OriginalURL := "https://jotx19.vercel.app/"
-	generateShortURL(OriginalURL)
+func createURL(originalURL string) string {
+	shortURL := generateShortURL(originalURL)
+	id := shortURL
+	urlDB[id] = URL{
+		ID:           id,
+		OriginalURL:  originalURL,
+		ShortURL:     shortURL,
+		CreationDate: time.Now(),
+	}
+	return shortURL
 }
